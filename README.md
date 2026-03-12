@@ -1,6 +1,6 @@
 # The Commons Business Alternatives Dashboard
 
-Investor-ready single-page dashboard for comparing the five modeled business alternatives in `The Commons Model v3.xlsx`, with Alternative 5 framed as the recommended capital-light model.
+Investor-ready single-page dashboard for comparing the five modeled business alternatives in the latest `The Commons Model v*.xlsx`, with Alternative 5 framed as the recommended capital-light model.
 
 ## Stack
 
@@ -12,7 +12,7 @@ Investor-ready single-page dashboard for comparing the five modeled business alt
 
 ## Data flow
 
-- `scripts/extract-dashboard-data.mjs` reads `The Commons Model v3.xlsx`.
+- `scripts/extract-dashboard-data.mjs` automatically reads the latest `The Commons Model v*.xlsx` workbook in the repo root.
 - The extractor writes `src/data/generatedDashboardData.ts`.
 - Editorial copy and curated pros/cons live in `src/data/editorialContent.ts`.
 - The app never reads the workbook at runtime; it ships a static snapshot.

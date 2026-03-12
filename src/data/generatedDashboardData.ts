@@ -2,17 +2,17 @@ import type { DashboardData } from '../types/dashboard'
 
 export const generatedDashboardData: DashboardData = {
   "source": {
-    "workbook": "The Commons Model v3.xlsx",
-    "generatedAt": "2026-03-10T04:26:28.810Z"
+    "workbook": "The Commons Model v4.xlsx",
+    "generatedAt": "2026-03-12T01:59:56.679Z"
   },
   "scenarios": {
     "a": {
       "code": "a",
-      "title": "BROKER ROLE (Equity stake -> “units equivalent” sold like the developer)",
+      "title": "BROKER ROLE (Equity stake → “units equivalent” sold like the developer)",
       "summary": "We broker the deal (between landowners - developers) and earn an equity-like slice that’s treated as if we “own” 5% of the homes being sold. We get paid as homes are sold, on the same schedule as the project’s sales cash receipts.",
       "cashFlowLines": [
-        "Revenue to us = Equity stake % x gross unit sales cash receipts (deposits + closings) for the scope selected.",
-        "Costs to us = optional Broker admin expense % x broker revenue (default 10%).",
+        "Revenue to us = Equity stake % × gross unit sales cash receipts (deposits + closings) for the scope selected.",
+        "Costs to us = $300k annual overhead from model start until broker sales begin; thereafter Broker admin expense % × broker revenue (default 10%).",
         "No developer profit share / capital calls are used in this scenario anymore (it’s “units-equivalent” sales)."
       ],
       "keyTakeaway": "This behaves like a revenue-share tied to home sales timing, not like being a co-developer putting cash in."
@@ -34,8 +34,8 @@ export const generatedDashboardData: DashboardData = {
       "title": "MASTER PLAN / ARCHITECTURE / MANIFESTO ROYALTY (on “future” projects)",
       "summary": "We create the “system” (master plan + design + manifesto) and earn a royalty on home sales in future Commons projects.",
       "cashFlowLines": [
-        "Royalty revenue = Royalty % x gross unit sales cash receipts (for the selected “future” projects).",
-        "Costs = optional Royalty admin expense % (default 10%).",
+        "Royalty revenue = Royalty % × selected gross unit sales cash receipts, activated once Project 1 reaches 80% sold-out.",
+        "Costs = optional Royalty admin expense % (default 10%) on activated royalty revenue.",
         "Royalty % (default 5%)"
       ],
       "keyTakeaway": "Typically no upfront investment is modeled here, so IRR/MOIC are often N/A (it’s mainly a “cash-in stream”)."
@@ -45,11 +45,11 @@ export const generatedDashboardData: DashboardData = {
       "title": "SELL FRACTIONALS FROM OUR EQUITY (weeks)",
       "summary": "Instead of waiting for equity value, we turn our stake into “units equivalent” and sell weeks of usage (like fractional time-based occupancy).",
       "cashFlowLines": [
-        "1. Units equivalent = Equity % owned x Total units in scope",
-        "2. Weeks available = Units equivalent x Weeks per unit",
-        "3. Weeks sold = Weeks available x % weeks sold",
-        "4. Revenue = Weeks sold x Price per week (grows annually)",
-        "5. Costs = Operating cost % x Revenue",
+        "1. Units equivalent = Equity % owned × Total units in scope",
+        "2. Weeks available = Units equivalent × Weeks per unit",
+        "3. Weeks sold = Weeks available × % weeks sold",
+        "4. Revenue = Weeks sold × Price per week (grows annually)",
+        "5. Costs = Operating cost % × Revenue",
         "6. Net = Revenue − Costs",
         "Main inputs:",
         "% weeks sold (default 60%)",
@@ -74,7 +74,7 @@ export const generatedDashboardData: DashboardData = {
       "title": "PLATFORM COMMUNITY FEES (all communities)",
       "summary": "We earn recurring community fees from completed homes across every successful Commons community.",
       "cashFlowLines": [
-        "Revenue = occupied homes x $15,000 annual fee / 12, aggregated monthly across all successful communities.",
+        "Revenue = occupied homes × $15,000 annual fee ÷ 12, aggregated monthly across all successful communities.",
         "Costs = 65% of revenue (35% net margin assumption)."
       ],
       "keyTakeaway": "This is a recurring, subscription-like platform model that scales as more homes are delivered and occupied."
@@ -94,84 +94,84 @@ export const generatedDashboardData: DashboardData = {
         "c"
       ],
       "includedScenarioLabel": "a + b + c",
-      "tenYearRevenue": 312449974,
-      "tenYearCosts": 164984517,
-      "tenYearNetCashFlow": 147465457,
-      "capitalRequirement": -140412294,
-      "peakDrawdownAbs": 140412294,
+      "tenYearRevenue": 307262474,
+      "tenYearCosts": 165590767,
+      "tenYearNetCashFlow": 141671707,
+      "capitalRequirement": -141537294,
+      "peakDrawdownAbs": 141537294,
       "payback": "Year 5",
-      "netMargin": 0.47196501607006053,
+      "netMargin": 0.4610771538603181,
       "recommended": false,
       "projections": [
         {
           "year": 1,
           "revenue": 0,
-          "costs": 0,
-          "netCashFlow": 0,
-          "cumulativeCashFlow": 0
+          "costs": 300000,
+          "netCashFlow": -300000,
+          "cumulativeCashFlow": -300000
         },
         {
           "year": 2,
           "revenue": 0,
-          "costs": 0,
-          "netCashFlow": 0,
-          "cumulativeCashFlow": 0
+          "costs": 300000,
+          "netCashFlow": -300000,
+          "cumulativeCashFlow": -600000
         },
         {
           "year": 3,
           "revenue": 0,
-          "costs": 67215349,
-          "netCashFlow": -67215349,
-          "cumulativeCashFlow": -67215349
+          "costs": 67515349,
+          "netCashFlow": -67515349,
+          "cumulativeCashFlow": -68115349
         },
         {
           "year": 4,
           "revenue": 281250,
-          "costs": 73478196,
-          "netCashFlow": -73196946,
-          "cumulativeCashFlow": -140412294
+          "costs": 73703196,
+          "netCashFlow": -73421946,
+          "cumulativeCashFlow": -141537294
         },
         {
           "year": 5,
-          "revenue": 195053597,
-          "costs": 16284722,
-          "netCashFlow": 178768874,
-          "cumulativeCashFlow": 38356580
+          "revenue": 189866097,
+          "costs": 15765972,
+          "netCashFlow": 174100124,
+          "cumulativeCashFlow": 32562830
         },
         {
           "year": 6,
           "revenue": 80177627,
           "costs": 4312500,
           "netCashFlow": 75865127,
-          "cumulativeCashFlow": 114221707
+          "cumulativeCashFlow": 108427957
         },
         {
           "year": 7,
           "revenue": 33187500,
           "costs": 3318750,
           "netCashFlow": 29868750,
-          "cumulativeCashFlow": 144090457
+          "cumulativeCashFlow": 138296707
         },
         {
           "year": 8,
           "revenue": 3750000,
           "costs": 375000,
           "netCashFlow": 3375000,
-          "cumulativeCashFlow": 147465457
+          "cumulativeCashFlow": 141671707
         },
         {
           "year": 9,
           "revenue": 0,
           "costs": 0,
           "netCashFlow": 0,
-          "cumulativeCashFlow": 147465457
+          "cumulativeCashFlow": 141671707
         },
         {
           "year": 10,
           "revenue": 0,
           "costs": 0,
           "netCashFlow": 0,
-          "cumulativeCashFlow": 147465457
+          "cumulativeCashFlow": 141671707
         }
       ]
     },
@@ -189,83 +189,83 @@ export const generatedDashboardData: DashboardData = {
       ],
       "includedScenarioLabel": "g + h + a",
       "tenYearRevenue": 123560510,
-      "tenYearCosts": 43125000,
-      "tenYearNetCashFlow": 80435510,
-      "capitalRequirement": -375000,
-      "peakDrawdownAbs": 375000,
+      "tenYearCosts": 44250000,
+      "tenYearNetCashFlow": 79310510,
+      "capitalRequirement": -975000,
+      "peakDrawdownAbs": 975000,
       "payback": "Year 3",
-      "netMargin": 0.6509807219151167,
+      "netMargin": 0.6418758711824676,
       "recommended": false,
       "projections": [
         {
           "year": 1,
           "revenue": 186250,
-          "costs": 500000,
-          "netCashFlow": -313750,
-          "cumulativeCashFlow": -313750
+          "costs": 800000,
+          "netCashFlow": -613750,
+          "cumulativeCashFlow": -613750
         },
         {
           "year": 2,
           "revenue": 438750,
-          "costs": 500000,
-          "netCashFlow": -61250,
-          "cumulativeCashFlow": -375000
+          "costs": 800000,
+          "netCashFlow": -361250,
+          "cumulativeCashFlow": -975000
         },
         {
           "year": 3,
           "revenue": 3243216,
-          "costs": 500000,
-          "netCashFlow": 2743216,
-          "cumulativeCashFlow": 2368216
+          "costs": 800000,
+          "netCashFlow": 2443216,
+          "cumulativeCashFlow": 1468216
         },
         {
           "year": 4,
           "revenue": 3556952,
-          "costs": 528125,
-          "netCashFlow": 3028827,
-          "cumulativeCashFlow": 5397044
+          "costs": 753125,
+          "netCashFlow": 2803827,
+          "cumulativeCashFlow": 4272044
         },
         {
           "year": 5,
           "revenue": 19828804,
           "costs": 2832813,
           "netCashFlow": 16995991,
-          "cumulativeCashFlow": 22393035
+          "cumulativeCashFlow": 21268035
         },
         {
           "year": 6,
           "revenue": 30873671,
           "costs": 6243750,
           "netCashFlow": 24629921,
-          "cumulativeCashFlow": 47022956
+          "cumulativeCashFlow": 45897956
         },
         {
           "year": 7,
           "revenue": 28485180,
           "costs": 8415625,
           "netCashFlow": 20069555,
-          "cumulativeCashFlow": 67092511
+          "cumulativeCashFlow": 65967511
         },
         {
           "year": 8,
           "revenue": 13718687,
           "costs": 7979688,
           "netCashFlow": 5738999,
-          "cumulativeCashFlow": 72831510
+          "cumulativeCashFlow": 71706510
         },
         {
           "year": 9,
           "revenue": 11655000,
           "costs": 7812500,
           "netCashFlow": 3842500,
-          "cumulativeCashFlow": 76674010
+          "cumulativeCashFlow": 75549010
         },
         {
           "year": 10,
           "revenue": 11574000,
           "costs": 7812500,
           "netCashFlow": 3761500,
-          "cumulativeCashFlow": 80435510
+          "cumulativeCashFlow": 79310510
         }
       ]
     },
@@ -283,83 +283,83 @@ export const generatedDashboardData: DashboardData = {
       ],
       "includedScenarioLabel": "a + b + e",
       "tenYearRevenue": 375819048,
-      "tenYearCosts": 171321424,
-      "tenYearNetCashFlow": 204497624,
-      "capitalRequirement": -112527801,
-      "peakDrawdownAbs": 112527801,
-      "payback": "Year 5",
-      "netMargin": 0.5441385291359686,
+      "tenYearCosts": 172446424,
+      "tenYearNetCashFlow": 203372624,
+      "capitalRequirement": -113652801,
+      "peakDrawdownAbs": 113652801,
+      "payback": "Year 2",
+      "netMargin": 0.5411450672399127,
       "recommended": false,
       "projections": [
         {
           "year": 1,
           "revenue": 0,
-          "costs": 0,
-          "netCashFlow": 0,
-          "cumulativeCashFlow": 0
+          "costs": 300000,
+          "netCashFlow": -300000,
+          "cumulativeCashFlow": -300000
         },
         {
           "year": 2,
           "revenue": 9828000,
-          "costs": 982800,
-          "netCashFlow": 8845200,
-          "cumulativeCashFlow": 8845200
+          "costs": 1282800,
+          "netCashFlow": 8545200,
+          "cumulativeCashFlow": 8245200
         },
         {
           "year": 3,
           "revenue": 10319400,
-          "costs": 68247289,
-          "netCashFlow": -57927889,
-          "cumulativeCashFlow": -49082689
+          "costs": 68547289,
+          "netCashFlow": -58227889,
+          "cumulativeCashFlow": -49982689
         },
         {
           "year": 4,
           "revenue": 11116620,
-          "costs": 74561733,
-          "netCashFlow": -63445113,
-          "cumulativeCashFlow": -112527801
+          "costs": 74786733,
+          "netCashFlow": -63670113,
+          "cumulativeCashFlow": -113652801
         },
         {
           "year": 5,
           "revenue": 200524485,
           "costs": 16831811,
           "netCashFlow": 183692674,
-          "cumulativeCashFlow": 71164873
+          "cumulativeCashFlow": 70039873
         },
         {
           "year": 6,
           "revenue": 71498622,
           "costs": 3444600,
           "netCashFlow": 68054023,
-          "cumulativeCashFlow": 139218895
+          "cumulativeCashFlow": 138093895
         },
         {
           "year": 7,
           "revenue": 29137045,
           "costs": 2913705,
           "netCashFlow": 26223341,
-          "cumulativeCashFlow": 165442236
+          "cumulativeCashFlow": 164317236
         },
         {
           "year": 8,
           "revenue": 15045460,
           "costs": 1504546,
           "netCashFlow": 13540914,
-          "cumulativeCashFlow": 178983150
+          "cumulativeCashFlow": 177858150
         },
         {
           "year": 9,
           "revenue": 13828983,
           "costs": 1382898,
           "netCashFlow": 12446085,
-          "cumulativeCashFlow": 191429235
+          "cumulativeCashFlow": 190304235
         },
         {
           "year": 10,
           "revenue": 14520432,
           "costs": 1452043,
           "netCashFlow": 13068389,
-          "cumulativeCashFlow": 204497624
+          "cumulativeCashFlow": 203372624
         }
       ]
     },
@@ -470,84 +470,84 @@ export const generatedDashboardData: DashboardData = {
         "h"
       ],
       "includedScenarioLabel": "a + c + h",
-      "tenYearRevenue": 151250000,
-      "tenYearCosts": 42625000,
-      "tenYearNetCashFlow": 108625000,
-      "capitalRequirement": 0,
-      "peakDrawdownAbs": 0,
-      "payback": "Cash-positive (no drawdown)",
-      "netMargin": 0.7181818181818181,
+      "tenYearRevenue": 146062500,
+      "tenYearCosts": 43231250,
+      "tenYearNetCashFlow": 102831250,
+      "capitalRequirement": -900000,
+      "peakDrawdownAbs": 900000,
+      "payback": "Year 5",
+      "netMargin": 0.7040222507488233,
       "recommended": true,
       "projections": [
         {
           "year": 1,
           "revenue": 0,
-          "costs": 0,
-          "netCashFlow": 0,
-          "cumulativeCashFlow": 0
+          "costs": 300000,
+          "netCashFlow": -300000,
+          "cumulativeCashFlow": -300000
         },
         {
           "year": 2,
           "revenue": 0,
-          "costs": 0,
-          "netCashFlow": 0,
-          "cumulativeCashFlow": 0
+          "costs": 300000,
+          "netCashFlow": -300000,
+          "cumulativeCashFlow": -600000
         },
         {
           "year": 3,
           "revenue": 0,
-          "costs": 0,
-          "netCashFlow": 0,
-          "cumulativeCashFlow": 0
+          "costs": 300000,
+          "netCashFlow": -300000,
+          "cumulativeCashFlow": -900000
         },
         {
           "year": 4,
           "revenue": 281250,
-          "costs": 28125,
-          "netCashFlow": 253125,
-          "cumulativeCashFlow": 253125
+          "costs": 253125,
+          "netCashFlow": 28125,
+          "cumulativeCashFlow": -871875
         },
         {
           "year": 5,
-          "revenue": 22187500,
-          "costs": 2923438,
-          "netCashFlow": 19264063,
-          "cumulativeCashFlow": 19517188
+          "revenue": 17000000,
+          "costs": 2404688,
+          "netCashFlow": 14595313,
+          "cumulativeCashFlow": 13723438
         },
         {
           "year": 6,
           "revenue": 48500000,
           "costs": 7806250,
           "netCashFlow": 40693750,
-          "cumulativeCashFlow": 60210938
+          "cumulativeCashFlow": 54417188
         },
         {
           "year": 7,
           "revenue": 42812500,
           "costs": 9575000,
           "netCashFlow": 33237500,
-          "cumulativeCashFlow": 93448438
+          "cumulativeCashFlow": 87654688
         },
         {
           "year": 8,
           "revenue": 14968750,
           "costs": 7667188,
           "netCashFlow": 7301563,
-          "cumulativeCashFlow": 100750000
+          "cumulativeCashFlow": 94956250
         },
         {
           "year": 9,
           "revenue": 11250000,
           "costs": 7312500,
           "netCashFlow": 3937500,
-          "cumulativeCashFlow": 104687500
+          "cumulativeCashFlow": 98893750
         },
         {
           "year": 10,
           "revenue": 11250000,
           "costs": 7312500,
           "netCashFlow": 3937500,
-          "cumulativeCashFlow": 108625000
+          "cumulativeCashFlow": 102831250
         }
       ]
     }

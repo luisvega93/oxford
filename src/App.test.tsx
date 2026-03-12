@@ -13,9 +13,9 @@ describe('App', () => {
     ).toBeInTheDocument()
     expect(screen.getByText(/selected model/i)).toBeInTheDocument()
     expect(
-      screen.getByText(/only option in the current model that clears more than \$100M/i),
+      screen.getByText(/most capital-efficient option in the current model/i),
     ).toBeInTheDocument()
-    expect(screen.getAllByText('$108.6M').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('$102.8M').length).toBeGreaterThan(0)
   })
 
   it('switches the alternative explorer content when a tab is selected', async () => {
@@ -60,6 +60,6 @@ describe('App', () => {
     })
 
     expect(within(annualProjectionTable).getByText(/\$186\.\dK/)).toBeInTheDocument()
-    expect(screen.getAllByText('$80.4M').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('$79.3M').length).toBeGreaterThan(0)
   })
 })

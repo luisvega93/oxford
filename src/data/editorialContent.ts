@@ -7,7 +7,7 @@ export const editorialContent: DashboardContent = {
     summary:
       'Alternative 5 captures transaction access, design-system royalties, and recurring platform fees without taking development balance-sheet risk.',
     callout:
-      'It is the only option in the current model that clears more than $100M of 10-year net cash flow while requiring no capital drawdown.',
+      'It remains the most capital-efficient option in the current model: more than $100M of 10-year net cash flow with less than $1M of peak drawdown.',
   },
   comparisonIntro:
     'The dashboard compares each business model on upside, capital intensity, and payback so investors can see the trade-off between absolute returns and execution risk.',
@@ -88,17 +88,18 @@ export const editorialContent: DashboardContent = {
       explanation:
         'Alternative 5 combines brokerage access, future-project royalties, and recurring platform fees into a diversified revenue stack that scales without direct development capital.',
       pros: [
-        'Only alternative with no modeled capital drawdown.',
-        'Still exceeds $100M of 10-year net cash flow with a 72% net margin.',
+        'Smallest capital requirement in the set, with peak drawdown still under $1M.',
+        'Still exceeds $100M of 10-year net cash flow at roughly a 70% net margin.',
         'Blends one-time, long-tail, and recurring revenue streams into a diversified investor story.',
       ],
       cons: [
+        'Payback shifts to Year 5 under the latest model assumptions.',
         'Delivers less absolute upside than the development-heavy models.',
         'Relies on third-party developers to bring projects to market.',
-        'Recurring platform fees build over time rather than showing immediate scale.',
+        'Recurring platform and royalty cash flows activate later than the developer-heavy paths.',
       ],
       investorAngle:
-        'This is the cleanest investor proposition: strong cash generation, multiple revenue streams, and dramatically lower capital and execution risk than the developer-led paths.',
+        'This is still the cleanest investor proposition: strong cash generation, multiple revenue streams, and dramatically lower capital intensity than the developer-led paths, even after the updated overhead assumptions.',
     },
   },
 }

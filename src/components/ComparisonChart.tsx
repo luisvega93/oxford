@@ -54,8 +54,9 @@ export function ComparisonChart({
             Net cash flow vs. capital required
           </p>
           <p className="mt-2 text-sm text-slate-600">
-            Up and left is better. Alternative 5 stays on the frontier because it
-            keeps capital at zero while still clearing nine figures of net cash.
+            Up and left is better. Alternative 5 still sits near the frontier
+            because it keeps peak capital under $1M while still clearing nine
+            figures of net cash.
           </p>
         </div>
       </div>

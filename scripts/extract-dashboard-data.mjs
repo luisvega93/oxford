@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import xlsx from 'xlsx'
 
-const workbookPath = path.resolve(process.cwd(), 'The Commons Model v3.xlsx')
+const workbookPath = await resolveWorkbookPath(process.cwd())
 const outputPath = path.resolve(
   process.cwd(),
   'src',
@@ -218,12 +218,37 @@ function buildScenarioDefinition(block) {
 }
 
 function normalizeWorkbookText(value) {
-  const repaired = /[Ãâ]/.test(value)
+  const repaired = /[ÃƒÃ¢]/.test(value)
     ? Buffer.from(value, 'latin1').toString('utf8')
     : value
 
   return repaired
-    .replaceAll('→', '->')
-    .replaceAll('×', 'x')
-    .replaceAll('÷', '/')
+    .replaceAll('â†’', '->')
+    .replaceAll('Ã—', 'x')
+    .replaceAll('Ã·', '/')
+}
+
+async function resolveWorkbookPath(cwd) {
+  const files = await fs.readdir(cwd)
+  const versionedWorkbooks = files
+    .map((fileName) => {
+      const match = fileName.match(/^The Commons Model v(\d+)\.xlsx$/i)
+
+      if (!match) {
+        return null
+      }
+
+      return {
+        fileName,
+        version: Number(match[1]),
+      }
+    })
+    .filter(Boolean)
+    .sort((left, right) => right.version - left.version)
+
+  if (!versionedWorkbooks.length) {
+    throw new Error('Could not find a workbook matching "The Commons Model v*.xlsx".')
+  }
+
+  return path.resolve(cwd, versionedWorkbooks[0].fileName)
 }
