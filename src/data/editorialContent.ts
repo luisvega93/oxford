@@ -88,18 +88,17 @@ export const editorialContent: DashboardContent = {
       explanation:
         'Alternative 5 combines brokerage access, future-project royalties, and recurring platform fees into a diversified revenue stack that scales without direct development capital.',
       pros: [
-        'Smallest capital requirement in the set, with peak drawdown still under $1M.',
-        'Still exceeds $100M of 10-year net cash flow at roughly a 70% net margin.',
+        'Keeps the model capital-light because value comes from access, IP, and recurring fees rather than direct construction exposure.',
+        'Lets users stress-test brokerage, royalty, and platform assumptions independently.',
         'Blends one-time, long-tail, and recurring revenue streams into a diversified investor story.',
       ],
       cons: [
-        'Payback shifts to Year 5 under the latest model assumptions.',
         'Delivers less absolute upside than the development-heavy models.',
         'Relies on third-party developers to bring projects to market.',
         'Recurring platform and royalty cash flows activate later than the developer-heavy paths.',
       ],
       investorAngle:
-        'This is still the cleanest investor proposition: strong cash generation, multiple revenue streams, and dramatically lower capital intensity than the developer-led paths, even after the updated overhead assumptions.',
+        'This remains the cleanest investor proposition for stress testing: strong cash generation potential, multiple revenue streams, and dramatically lower capital intensity than the developer-led paths.',
     },
   },
 }

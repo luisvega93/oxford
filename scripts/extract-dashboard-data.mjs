@@ -15,10 +15,11 @@ const usedScenarioCodes = new Set(['a', 'b', 'c', 'e', 'g', 'h'])
 const workbook = xlsx.readFile(workbookPath)
 const alternativesSheet = workbook.Sheets['Business Alternatives']
 const scenariosSheet = workbook.Sheets.Scenarios
+const resultsSheet = workbook.Sheets.Results_10yr
 
-if (!alternativesSheet || !scenariosSheet) {
+if (!alternativesSheet || !scenariosSheet || !resultsSheet) {
   throw new Error(
-    'Expected both "Business Alternatives" and "Scenarios" worksheets to exist.',
+    'Expected "Business Alternatives", "Scenarios", and "Results_10yr" worksheets to exist.',
   )
 }
 
@@ -31,6 +32,12 @@ const alternativeRows = xlsx.utils.sheet_to_json(alternativesSheet, {
 const scenarioRows = xlsx.utils
   .sheet_to_json(scenariosSheet, { header: 1, raw: false, defval: '' })
   .map((row) => cleanText(row[0]))
+
+const resultsRows = xlsx.utils.sheet_to_json(resultsSheet, {
+  header: 1,
+  raw: true,
+  defval: null,
+})
 
 const summaryHeaderIndex = alternativeRows.findIndex(
   (row) => row[0] === 'Alternative' && row[1] === 'Included scenarios',
@@ -77,6 +84,26 @@ const alternatives = summaryRows.map((row, index) => {
   }
 })
 
+const alternative5 = alternatives.find((alternative) => alternative.id === 'alternative-5')
+
+if (!alternative5) {
+  throw new Error('Could not locate Alternative 5 in Business Alternatives.')
+}
+
+const brokerProjection = extractScenarioProjection(
+  resultsRows,
+  'a) Broker (equity stake)',
+)
+const royaltyProjection = extractScenarioProjection(
+  resultsRows,
+  'c) Royalty (future projects)',
+)
+const platformProjection = derivePlatformProjection(
+  alternative5.projections,
+  brokerProjection,
+  royaltyProjection,
+)
+
 const scenarioDefinitions = extractScenarioDefinitions(scenarioRows)
 
 const generatedDashboardData = {
@@ -86,6 +113,38 @@ const generatedDashboardData = {
   },
   scenarios: scenarioDefinitions,
   alternatives,
+  modeling: {
+    alternative5: {
+      defaultInputs: {
+        brokerEquityPct: asNumber(
+          findControlValue(resultsRows, 'Equity stake %'),
+        ),
+        brokerAdminCostPct: asNumber(
+          findControlValue(resultsRows, 'Broker admin expense % of broker revenue'),
+        ),
+        royaltyRatePct: asNumber(
+          findControlValue(resultsRows, 'Royalty % on gross unit sales'),
+        ),
+        royaltyAdminCostPct: asNumber(
+          findControlValue(resultsRows, 'Royalty admin expense % of royalty revenue'),
+        ),
+        platformAnnualFee: asMoney(
+          findControlValue(resultsRows, 'Annual community fee / unit'),
+        ),
+        platformNetMarginPct: asNumber(
+          findControlValue(resultsRows, 'Net margin'),
+        ),
+      },
+      brokerPreSalesOverheadAnnual: asMoney(
+        findControlValue(resultsRows, 'Broker pre-sales overhead (annual)'),
+      ),
+      components: {
+        broker: brokerProjection,
+        royalty: royaltyProjection,
+        platform: platformProjection,
+      },
+    },
+  },
 }
 
 const fileContents = `import type { DashboardData } from '../types/dashboard'
@@ -114,6 +173,15 @@ function asMoney(value) {
 
   const numeric = Number(String(value).replace(/[$,]/g, ''))
   return Number.isFinite(numeric) ? Math.round(numeric) : 0
+}
+
+function asNumber(value) {
+  if (typeof value === 'number') {
+    return value
+  }
+
+  const numeric = Number(value)
+  return Number.isFinite(numeric) ? numeric : 0
 }
 
 function extractProjectionBlock(rows, order) {
@@ -159,6 +227,80 @@ function readProjectionRows(rows, startRow, startColumn) {
   }
 
   return projections
+}
+
+function extractScenarioProjection(rows, scenarioLabel) {
+  const titlesRowIndex = rows.findIndex(
+    (row, index) =>
+      row.includes(scenarioLabel) &&
+      cleanText(rows[index + 1]?.[0]) === 'Year',
+  )
+
+  if (titlesRowIndex === -1) {
+    throw new Error(`Could not find a scenario table for ${scenarioLabel}.`)
+  }
+
+  const titlesRow = rows[titlesRowIndex]
+  const scenarioColumnIndex = titlesRow.indexOf(scenarioLabel)
+
+  if (scenarioColumnIndex === -1) {
+    throw new Error(`Could not resolve the scenario column for ${scenarioLabel}.`)
+  }
+
+  const projections = []
+
+  for (let rowIndex = titlesRowIndex + 2; rowIndex < rows.length; rowIndex += 1) {
+    const row = rows[rowIndex]
+    const yearCell = row?.[0]
+    const label = cleanText(yearCell)
+
+    if (!label) {
+      continue
+    }
+
+    if (label === '10-Year Total' || label === '10-yr total') {
+      break
+    }
+
+    projections.push({
+      year: Number(yearCell),
+      revenue: asMoney(row[scenarioColumnIndex]),
+      costs: asMoney(row[scenarioColumnIndex + 1]),
+      netCashFlow: asMoney(row[scenarioColumnIndex + 2]),
+      cumulativeCashFlow: asMoney(row[scenarioColumnIndex + 3]),
+    })
+  }
+
+  return projections
+}
+
+function derivePlatformProjection(alternativeProjection, brokerProjection, royaltyProjection) {
+  return alternativeProjection.map((projection, index) => {
+    const broker = brokerProjection[index]
+    const royalty = royaltyProjection[index]
+
+    return {
+      year: projection.year,
+      revenue: asMoney(projection.revenue - broker.revenue - royalty.revenue),
+      costs: asMoney(projection.costs - broker.costs - royalty.costs),
+      netCashFlow: asMoney(
+        projection.netCashFlow - broker.netCashFlow - royalty.netCashFlow,
+      ),
+      cumulativeCashFlow: 0,
+    }
+  })
+}
+
+function findControlValue(rows, label) {
+  for (const row of rows) {
+    const columnIndex = row.findIndex((cell) => cleanText(cell) === label)
+
+    if (columnIndex !== -1) {
+      return row[columnIndex + 1]
+    }
+  }
+
+  throw new Error(`Could not find control value for "${label}".`)
 }
 
 function extractScenarioDefinitions(rows) {

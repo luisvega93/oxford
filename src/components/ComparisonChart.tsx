@@ -54,9 +54,9 @@ export function ComparisonChart({
             Net cash flow vs. capital required
           </p>
           <p className="mt-2 text-sm text-slate-600">
-            Up and left is better. Alternative 5 still sits near the frontier
-            because it keeps peak capital under $1M while still clearing nine
-            figures of net cash.
+            Up and left is better. Alternative 5 is highlighted so you can see
+            how its live capital intensity and cash generation move as the
+            editable assumptions change.
           </p>
         </div>
       </div>

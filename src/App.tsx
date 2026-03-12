@@ -1,5 +1,6 @@
-import { startTransition, useDeferredValue, useState } from 'react'
+import { startTransition, useDeferredValue, useEffect, useState } from 'react'
 
+import { Alternative5Controls } from './components/Alternative5Controls'
 import { ComparisonChart } from './components/ComparisonChart'
 import { MetricCard } from './components/MetricCard'
 import { ProjectionChart } from './components/ProjectionChart'
@@ -7,7 +8,13 @@ import { ScenarioBadge } from './components/ScenarioBadge'
 import { SectionHeading } from './components/SectionHeading'
 import { editorialContent } from './data/editorialContent'
 import { generatedDashboardData } from './data/generatedDashboardData'
-import type { Alternative } from './types/dashboard'
+import type { Alternative, Alternative5Inputs } from './types/dashboard'
+import {
+  areAlternative5InputsEqual,
+  buildAlternative5LocalCopy,
+  buildAlternative5Model,
+  sanitizeAlternative5Inputs,
+} from './utils/alternative5Model'
 import {
   formatCurrencyCompact,
   formatDrawdown,
@@ -18,9 +25,15 @@ import {
 
 type SortMetric = 'tenYearNetCashFlow' | 'peakDrawdownAbs' | 'netMargin' | 'payback'
 
-const recommendedAlternative =
-  generatedDashboardData.alternatives.find((alternative) => alternative.recommended) ??
-  generatedDashboardData.alternatives[0]
+const ALTERNATIVE_5_ID = 'alternative-5'
+const ALT5_STORAGE_KEY = 'oxford-alternative-5-inputs'
+
+const baseAlternative5 =
+  generatedDashboardData.alternatives.find(
+    (alternative) => alternative.id === ALTERNATIVE_5_ID,
+  ) ?? generatedDashboardData.alternatives[0]
+
+const alternative5Defaults = generatedDashboardData.modeling.alternative5.defaultInputs
 
 const sortOptions: Array<{
   value: SortMetric
@@ -33,22 +46,41 @@ const sortOptions: Array<{
 ]
 
 function App() {
-  const [selectedAlternativeId, setSelectedAlternativeId] = useState(
-    recommendedAlternative.id,
-  )
+  const [selectedAlternativeId, setSelectedAlternativeId] =
+    useState(ALTERNATIVE_5_ID)
   const [sortMetric, setSortMetric] = useState<SortMetric>('tenYearNetCashFlow')
+  const [alternative5Inputs, setAlternative5Inputs] = useState(() =>
+    loadAlternative5Inputs(alternative5Defaults),
+  )
 
+  useEffect(() => {
+    persistAlternative5Inputs(alternative5Inputs, alternative5Defaults)
+  }, [alternative5Inputs])
+
+  const modeledAlternative5 = buildAlternative5Model(
+    baseAlternative5,
+    generatedDashboardData.modeling.alternative5,
+    alternative5Inputs,
+  )
+  const alternatives = generatedDashboardData.alternatives.map((alternative) =>
+    alternative.id === ALTERNATIVE_5_ID ? modeledAlternative5.alternative : alternative,
+  )
+  const recommendedAlternative =
+    alternatives.find((alternative) => alternative.id === ALTERNATIVE_5_ID) ??
+    alternatives[0]
   const deferredAlternativeId = useDeferredValue(selectedAlternativeId)
   const selectedAlternative =
-    generatedDashboardData.alternatives.find(
-      (alternative) => alternative.id === deferredAlternativeId,
-    ) ?? recommendedAlternative
+    alternatives.find((alternative) => alternative.id === deferredAlternativeId) ??
+    recommendedAlternative
   const selectedEditorial =
     editorialContent.alternatives[selectedAlternative.id] ??
     editorialContent.alternatives[recommendedAlternative.id]
-
-  const sortedAlternatives = [...generatedDashboardData.alternatives].sort((left, right) =>
+  const sortedAlternatives = [...alternatives].sort((left, right) =>
     sortAlternatives(left, right, sortMetric),
+  )
+  const hasCustomAlternative5Inputs = !areAlternative5InputsEqual(
+    alternative5Inputs,
+    alternative5Defaults,
   )
 
   return (
@@ -105,13 +137,13 @@ function App() {
                 Investor takeaway
               </p>
               <p className="mt-3 text-lg font-semibold leading-8 text-[var(--color-ink)]">
-                {editorialContent.hero.callout}
+                {buildAlternative5Callout(
+                  recommendedAlternative,
+                  hasCustomAlternative5Inputs,
+                )}
               </p>
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-                {
-                  editorialContent.alternatives[recommendedAlternative.id]
-                    .investorAngle
-                }
+                {editorialContent.alternatives[ALTERNATIVE_5_ID].investorAngle}
               </p>
             </div>
           </div>
@@ -146,7 +178,7 @@ function App() {
 
           <div className="grid gap-6 xl:grid-cols-[1fr_1.1fr]">
             <ComparisonChart
-              alternatives={generatedDashboardData.alternatives}
+              alternatives={alternatives}
               selectedAlternativeId={selectedAlternative.id}
             />
 
@@ -196,9 +228,7 @@ function App() {
                             : ''
                         }`}
                         onClick={() => {
-                          startTransition(() =>
-                            setSelectedAlternativeId(alternative.id),
-                          )
+                          startTransition(() => setSelectedAlternativeId(alternative.id))
                         }}
                       >
                         <td className="px-6 py-4">
@@ -243,12 +273,12 @@ function App() {
           <SectionHeading
             eyebrow="Alternative explorer"
             title="Understand the business model behind each option."
-            description="Use the tabs to review the thesis, component scenarios, curated pros and cons, and the investor narrative for each alternative."
+            description="Use the tabs to review the thesis, component scenarios, curated pros and cons, the investor narrative, and live parameters for Alternative 5."
           />
 
           <div className="panel px-6 py-6 sm:px-8">
             <div className="flex flex-wrap gap-3">
-              {generatedDashboardData.alternatives.map((alternative) => (
+              {alternatives.map((alternative) => (
                 <button
                   key={alternative.id}
                   type="button"
@@ -355,6 +385,47 @@ function App() {
                   </div>
                 </div>
 
+                {selectedAlternative.id === ALTERNATIVE_5_ID ? (
+                  <Alternative5Controls
+                    inputs={alternative5Inputs}
+                    defaults={alternative5Defaults}
+                    hasCustomInputs={hasCustomAlternative5Inputs}
+                    onPercentChange={(field, value) => {
+                      setAlternative5Inputs((current) =>
+                        sanitizeAlternative5Inputs({
+                          ...current,
+                          [field]: value,
+                        }),
+                      )
+                    }}
+                    onCurrencyChange={(field, value) => {
+                      setAlternative5Inputs((current) =>
+                        sanitizeAlternative5Inputs({
+                          ...current,
+                          [field]: value,
+                        }),
+                      )
+                    }}
+                    onReset={() => {
+                      setAlternative5Inputs(alternative5Defaults)
+                    }}
+                    onDownload={() => {
+                      if (!hasCustomAlternative5Inputs) {
+                        return
+                      }
+
+                      downloadAlternative5LocalCopy(
+                        buildAlternative5LocalCopy(
+                          generatedDashboardData.source.workbook,
+                          modeledAlternative5.alternative,
+                          modeledAlternative5.components,
+                          modeledAlternative5.inputs,
+                        ),
+                      )
+                    }}
+                  />
+                ) : null}
+
                 <div className="grid gap-4 sm:grid-cols-2">
                   <MetricCard
                     label="10-year revenue"
@@ -371,10 +442,7 @@ function App() {
                     )}
                     accent
                   />
-                  <MetricCard
-                    label="Payback"
-                    value={selectedAlternative.payback}
-                  />
+                  <MetricCard label="Payback" value={selectedAlternative.payback} />
                 </div>
               </aside>
             </div>
@@ -427,7 +495,10 @@ function App() {
                   </p>
                 </div>
                 <div className="max-h-[24rem] overflow-auto">
-                  <table aria-label="Annual projection table" className="min-w-full text-left text-sm">
+                  <table
+                    aria-label="Annual projection table"
+                    className="min-w-full text-left text-sm"
+                  >
                     <thead className="sticky top-0 bg-[rgba(248,243,232,0.96)] text-xs uppercase tracking-[0.24em] text-slate-500">
                       <tr>
                         <th className="px-6 py-4">Year</th>
@@ -477,6 +548,12 @@ function App() {
             Source workbook: {generatedDashboardData.source.workbook}. Data generated{' '}
             {formatGeneratedDate(generatedDashboardData.source.generatedAt)}.
           </p>
+          {hasCustomAlternative5Inputs ? (
+            <p className="mt-3">
+              Custom Alternative 5 inputs are currently active and stored locally
+              in this browser.
+            </p>
+          ) : null}
         </footer>
       </main>
     </div>
@@ -516,6 +593,82 @@ function sortAlternatives(left: Alternative, right: Alternative, sortMetric: Sor
     default:
       return right.tenYearNetCashFlow - left.tenYearNetCashFlow
   }
+}
+
+function buildAlternative5Callout(
+  alternative: Alternative,
+  hasCustomInputs: boolean,
+) {
+  const intro = hasCustomInputs ? 'Custom input scenario' : 'Current modeled outcome'
+  const payback =
+    alternative.payback.toLowerCase().includes('cash-positive')
+      ? alternative.payback.toLowerCase()
+      : `${alternative.payback.toLowerCase()} payback`
+
+  return `${intro}: ${formatCurrencyCompact(
+    alternative.tenYearNetCashFlow,
+  )} of 10-year net cash flow, ${formatDrawdown(
+    alternative.peakDrawdownAbs,
+  )} of peak drawdown, and ${payback}.`
+}
+
+function loadAlternative5Inputs(defaults: Alternative5Inputs) {
+  if (typeof window === 'undefined') {
+    return defaults
+  }
+
+  try {
+    const stored = window.localStorage.getItem(ALT5_STORAGE_KEY)
+
+    if (!stored) {
+      return defaults
+    }
+
+    const parsed = JSON.parse(stored) as Partial<Alternative5Inputs>
+    return sanitizeAlternative5Inputs({
+      ...defaults,
+      ...parsed,
+    })
+  } catch {
+    return defaults
+  }
+}
+
+function persistAlternative5Inputs(
+  inputs: Alternative5Inputs,
+  defaults: Alternative5Inputs,
+) {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  try {
+    if (areAlternative5InputsEqual(inputs, defaults)) {
+      window.localStorage.removeItem(ALT5_STORAGE_KEY)
+      return
+    }
+
+    window.localStorage.setItem(ALT5_STORAGE_KEY, JSON.stringify(inputs))
+  } catch {
+    // Ignore local persistence failures so modeling still works.
+  }
+}
+
+function downloadAlternative5LocalCopy(snapshot: unknown) {
+  const blob = new Blob([JSON.stringify(snapshot, null, 2)], {
+    type: 'application/json',
+  })
+  const fileName = `oxford-alternative-5-${new Date()
+    .toISOString()
+    .replaceAll(':', '-')
+    .replaceAll('.', '-')}.json`
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+
+  link.href = url
+  link.download = fileName
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 export default App

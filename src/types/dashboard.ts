@@ -8,6 +8,25 @@ export interface AnnualProjection {
   cumulativeCashFlow: number
 }
 
+export interface Alternative5Inputs {
+  brokerEquityPct: number
+  brokerAdminCostPct: number
+  royaltyRatePct: number
+  royaltyAdminCostPct: number
+  platformAnnualFee: number
+  platformNetMarginPct: number
+}
+
+export interface Alternative5ModelingData {
+  defaultInputs: Alternative5Inputs
+  brokerPreSalesOverheadAnnual: number
+  components: {
+    broker: AnnualProjection[]
+    royalty: AnnualProjection[]
+    platform: AnnualProjection[]
+  }
+}
+
 export interface ScenarioDefinition {
   code: ScenarioCode
   title: string
@@ -64,4 +83,7 @@ export interface DashboardData {
   }
   scenarios: Record<ScenarioCode, ScenarioDefinition>
   alternatives: Alternative[]
+  modeling: {
+    alternative5: Alternative5ModelingData
+  }
 }

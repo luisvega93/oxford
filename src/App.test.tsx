@@ -1,21 +1,44 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import App from './App'
+import { generatedDashboardData } from './data/generatedDashboardData'
+import { buildAlternative5Model } from './utils/alternative5Model'
+import { formatCurrencyCompact } from './utils/format'
+
+const ALT5_STORAGE_KEY = 'oxford-alternative-5-inputs'
+const baseAlternative5 = generatedDashboardData.alternatives.find(
+  (alternative) => alternative.id === 'alternative-5',
+)
+
+if (!baseAlternative5) {
+  throw new Error('Alternative 5 test fixture is missing.')
+}
 
 describe('App', () => {
-  it('renders the recommended model with the investor takeaway and KPIs', () => {
+  beforeEach(() => {
+    window.localStorage.clear()
+    vi.restoreAllMocks()
+  })
+
+  it('renders the recommended model with live Alternative 5 controls', () => {
     render(<App />)
 
     expect(
       screen.getByRole('heading', { name: /business alternatives dashboard/i }),
     ).toBeInTheDocument()
     expect(screen.getByText(/selected model/i)).toBeInTheDocument()
+    expect(screen.getByText(/investor takeaway/i)).toBeInTheDocument()
     expect(
-      screen.getByText(/most capital-efficient option in the current model/i),
+      screen.getByText(
+        /Current modeled outcome: \$102\.8M of 10-year net cash flow, \$900K of peak drawdown, and year 5 payback\./i,
+      ),
     ).toBeInTheDocument()
-    expect(screen.getAllByText('$102.8M').length).toBeGreaterThan(0)
+    expect(screen.getByText(/Workbook defaults active/i)).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /download local copy/i }),
+    ).toBeDisabled()
   })
 
   it('switches the alternative explorer content when a tab is selected', async () => {
@@ -62,4 +85,99 @@ describe('App', () => {
     expect(within(annualProjectionTable).getByText(/\$186\.\dK/)).toBeInTheDocument()
     expect(screen.getAllByText('$79.3M').length).toBeGreaterThan(0)
   })
+
+  it('updates Alternative 5 live and persists custom inputs locally', async () => {
+    const user = userEvent.setup()
+    const modeledAlternative5 = buildAlternative5Model(
+      baseAlternative5,
+      generatedDashboardData.modeling.alternative5,
+      {
+        ...generatedDashboardData.modeling.alternative5.defaultInputs,
+        brokerEquityPct: 0.1,
+      },
+    ).alternative
+
+    render(<App />)
+
+    const brokerEquityInput = screen.getByRole('spinbutton', {
+      name: /broker equity %/i,
+    })
+
+    await user.clear(brokerEquityInput)
+    await user.type(brokerEquityInput, '10')
+
+    await waitFor(() => {
+      expect(screen.getByText(/Custom scenario active/i)).toBeInTheDocument()
+    })
+
+    expect(
+      screen.getByText(
+        new RegExp(
+          `Custom input scenario: ${escapeForRegExp(
+            formatCurrencyCompact(modeledAlternative5.tenYearNetCashFlow),
+          )} of 10-year net cash flow`,
+          'i',
+        ),
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /download local copy/i }),
+    ).toBeEnabled()
+
+    await waitFor(() => {
+      expect(
+        JSON.parse(window.localStorage.getItem(ALT5_STORAGE_KEY) ?? '{}'),
+      ).toMatchObject({
+        brokerEquityPct: 0.1,
+      })
+    })
+  })
+
+  it('downloads a local Alternative 5 snapshot once inputs change', async () => {
+    const user = userEvent.setup()
+    const createObjectURL = vi
+      .spyOn(URL, 'createObjectURL')
+      .mockReturnValue('blob:oxford-test')
+    const revokeObjectURL = vi
+      .spyOn(URL, 'revokeObjectURL')
+      .mockImplementation(() => undefined)
+    const clickSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => undefined)
+    const modeledAlternative5 = buildAlternative5Model(
+      baseAlternative5,
+      generatedDashboardData.modeling.alternative5,
+      {
+        ...generatedDashboardData.modeling.alternative5.defaultInputs,
+        brokerEquityPct: 0.1,
+      },
+    ).alternative
+
+    render(<App />)
+
+    const brokerEquityInput = screen.getByRole('spinbutton', {
+      name: /broker equity %/i,
+    })
+
+    await user.clear(brokerEquityInput)
+    await user.type(brokerEquityInput, '10')
+    await user.click(screen.getByRole('button', { name: /download local copy/i }))
+
+    expect(createObjectURL).toHaveBeenCalledTimes(1)
+    expect(clickSpy).toHaveBeenCalledTimes(1)
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:oxford-test')
+
+    const blob = createObjectURL.mock.calls[0][0] as Blob
+    const snapshot = JSON.parse(await blob.text())
+
+    expect(snapshot.sourceWorkbook).toBe(generatedDashboardData.source.workbook)
+    expect(snapshot.inputs).toMatchObject({ brokerEquityPct: 0.1 })
+    expect(snapshot.summary.tenYearNetCashFlow).toBe(
+      modeledAlternative5.tenYearNetCashFlow,
+    )
+  })
 })
+
+function escapeForRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
