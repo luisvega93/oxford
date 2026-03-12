@@ -10,41 +10,52 @@ function shortTitle(title: string) {
 }
 
 export function ScenarioBadge({ scenario }: ScenarioBadgeProps) {
+  const title = shortTitle(scenario.title)
+  const summary = repairText(scenario.summary)
+  const keyTakeaway = repairText(scenario.keyTakeaway)
+  const cashFlowPreview = scenario.cashFlowLines
+    .slice(0, 2)
+    .map((line) => repairText(line))
+
   return (
-    <div className="group relative">
-      <button
-        type="button"
-        className="flex w-full items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-white px-4 py-3 text-left shadow-[0_14px_40px_rgba(19,49,44,0.06)] transition-transform duration-200 hover:-translate-y-0.5"
-      >
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-ink)] text-sm font-bold uppercase tracking-[0.16em] text-white">
+    <article className="rounded-[1.5rem] border border-[var(--color-border)] bg-white px-4 py-4 shadow-[0_14px_40px_rgba(19,49,44,0.06)]">
+      <div className="flex items-start gap-3">
+        <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-ink)] text-sm font-bold uppercase tracking-[0.16em] text-white">
           {scenario.code}
         </span>
-        <span className="text-sm font-semibold text-[var(--color-ink)]">
-          {shortTitle(scenario.title)}
-        </span>
-      </button>
 
-      <div className="pointer-events-none absolute left-0 top-[calc(100%+0.75rem)] z-20 w-[min(24rem,calc(100vw-3rem))] rounded-3xl border border-[var(--color-border)] bg-[rgba(248,243,232,0.98)] p-5 text-sm text-slate-700 opacity-0 shadow-[0_30px_80px_rgba(19,49,44,0.14)] transition duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--color-accent)]">
-          Scenario {scenario.code.toUpperCase()}
-        </p>
-        <p className="mt-3 font-semibold text-[var(--color-ink)]">
-          {repairText(scenario.title)}
-        </p>
-        <p className="mt-3 leading-6">{repairText(scenario.summary)}</p>
-        {scenario.cashFlowLines.length > 0 ? (
-          <ul className="mt-3 space-y-2">
-            {scenario.cashFlowLines.slice(0, 3).map((line) => (
-              <li key={line} className="rounded-2xl bg-white/80 px-3 py-2 leading-5">
-                {repairText(line)}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        <p className="mt-3 rounded-2xl border border-white/70 bg-white/70 px-3 py-3 leading-5 text-slate-600">
-          {repairText(scenario.keyTakeaway)}
-        </p>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm font-semibold uppercase tracking-[0.04em] text-[var(--color-ink)]">
+              {title}
+            </p>
+            <span className="rounded-full bg-[rgba(22,49,45,0.06)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+              Scenario {scenario.code.toUpperCase()}
+            </span>
+          </div>
+
+          <p className="mt-2 text-sm leading-6 text-slate-600">{summary}</p>
+
+          {cashFlowPreview.length > 0 ? (
+            <ul className="mt-3 space-y-2">
+              {cashFlowPreview.map((line) => (
+                <li
+                  key={line}
+                  className="rounded-2xl bg-[rgba(210,166,78,0.12)] px-3 py-2 text-xs leading-5 text-[var(--color-accent-strong)]"
+                >
+                  {line}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          {keyTakeaway ? (
+            <p className="mt-3 rounded-2xl bg-[rgba(248,243,232,0.9)] px-3 py-3 text-sm leading-6 text-slate-600">
+              {keyTakeaway}
+            </p>
+          ) : null}
+        </div>
       </div>
-    </div>
+    </article>
   )
 }

@@ -3,7 +3,7 @@ import type { DashboardData } from '../types/dashboard'
 export const generatedDashboardData: DashboardData = {
   "source": {
     "workbook": "The Commons Model v4.xlsx",
-    "generatedAt": "2026-03-12T02:39:33.629Z"
+    "generatedAt": "2026-03-12T03:21:23.607Z"
   },
   "scenarios": {
     "a": {

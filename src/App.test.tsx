@@ -35,6 +35,9 @@ describe('App', () => {
         /Current modeled outcome: \$102\.8M of 10-year net cash flow, \$900K of peak drawdown, and year 5 payback\./i,
       ),
     ).toBeInTheDocument()
+    expect(screen.getByText(/broker role/i)).toBeInTheDocument()
+    expect(screen.getByText(/master plan \/ architecture \/ manifesto royalty/i)).toBeInTheDocument()
+    expect(screen.getByText(/platform community fees/i)).toBeInTheDocument()
     expect(screen.getByText(/Workbook defaults active/i)).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: /download local copy/i }),
